@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "azure-ai-inference-plus"
+version = "1.0.0"
+description = "Enhanced wrapper for Azure AI Inference SDK with automatic retry, JSON validation, and reasoning separation"
+authors = [{ name = "Zach Grimaldi" }]
+readme = "README.md"
+license = "MIT"
+keywords = [
+    "azure",
+    "ai",
+    "foundry",
+    "inference",
+    "retry",
+    "json",
+    "validation",
+    "chat",
+    "completions",
+    "embeddings",
+    "reasoning",
+    "deepseek"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+dependencies = ["azure-ai-inference==1.0.0b9", "azure-core==1.34.0"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0",
+    "pytest-asyncio>=0.18.0",
+    "pytest-cov>=2.0",
+    "black>=22.0",
+    "isort>=5.0",
+    "flake8>=4.0",
+    "mypy>=0.950",
+]
+
+[project.urls]
+Homepage = "https://github.com/zpg6/azure-ai-inference-plus"
+Repository = "https://github.com/zpg6/azure-ai-inference-plus.git"
+Issues = "https://github.com/zpg6/azure-ai-inference-plus/issues"
+
+[tool.setuptools.packages.find]
+include = ["azure_ai_inference_plus*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
