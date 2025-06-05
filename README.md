@@ -232,4 +232,8 @@ All examples show real-world usage patterns and advanced features.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+[MIT](./LICENSE)
+
+## Contributing
+
+Contributions are welcome! Whether it's bug fixes, feature additions, or documentation improvements, we appreciate your help in making this project better. For major changes or new features, please open an issue first to discuss what you would like to change.
