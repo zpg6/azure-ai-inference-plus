@@ -2,6 +2,10 @@
 
 **The easier way to use Azure AI Inference SDK** ✨
 
+[![PyPI Version](https://img.shields.io/pypi/v/azure-ai-inference-plus)](https://pypi.org/project/azure-ai-inference-plus/)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/azure-ai-inference-plus)](https://pypi.org/project/azure-ai-inference-plus/)
+[![License: MIT](https://img.shields.io/pypi/l/azure-ai-inference-plus)](https://opensource.org/licenses/MIT)
+
 Enhanced wrapper that makes Azure AI Inference SDK simple and reliable with **automatic retry**, **JSON validation**, and **reasoning separation**.
 
 ## Why Use This Instead?
