@@ -18,6 +18,8 @@ Enhanced wrapper that makes Azure AI Inference SDK simple and reliable with **au
 pip install azure-ai-inference-plus
 ```
 
+Supports Python 3.10+
+
 ## Quick Start
 
 ```python
