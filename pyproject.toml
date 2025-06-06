@@ -42,10 +42,15 @@ dev = [
     "pytest>=6.0",
     "pytest-asyncio>=0.18.0",
     "pytest-cov>=2.0",
+    "pytest-mock>=3.0",
     "black>=22.0",
     "isort>=5.0",
     "flake8>=4.0",
     "mypy>=0.950",
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+    "langchain-community>=0.3.0",
+    "python-dotenv>=0.19.0",
 ]
 
 [project.urls]
