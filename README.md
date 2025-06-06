@@ -81,7 +81,29 @@ print(response.choices[0].message.reasoning)
 # "Let me think about this step by step. 2 + 2 is a basic addition..."
 ```
 
-**For JSON mode, reasoning is automatically removed so you get clean JSON:**
+### ✅ Guaranteed Valid JSON
+
+No more JSON parsing errors - automatic validation and retry.
+
+**Simple JSON (standard models like GPT-4o):**
+
+```python
+response = client.complete(
+    messages=[
+        SystemMessage(content="You are a helpful assistant that returns JSON."),
+        UserMessage(content="Give me Tokyo info as JSON with keys: name, country, population"),
+    ],
+    max_tokens=500,
+    model="gpt-4o",
+    response_format="json_object"  # ✨ Auto-validation + retry
+)
+
+# Always valid JSON, no try/catch needed!
+import json
+data = json.loads(response.choices[0].message.content)  # ✅ Works perfectly
+```
+
+**JSON with reasoning models (like DeepSeek-R1):**
 
 ```python
 response = client.complete(
@@ -89,33 +111,20 @@ response = client.complete(
         SystemMessage(content="You are a helpful assistant that returns JSON."),
         UserMessage(content="Give me Paris info as JSON with keys: name, country, population"),
     ],
-    max_tokens=2000,
+    max_tokens=2000,  # More tokens needed for reasoning + JSON
     model="DeepSeek-R1",
     response_format="json_object",  # ✨ Clean JSON guaranteed
-    reasoning_tags=["<think>", "</think>"]
+    reasoning_tags=["<think>", "</think>"]  # Required for reasoning separation
 )
 
 # Pure JSON - reasoning automatically stripped
-data = response.choices[0].message.content  # {"name": "Paris", ...}
+data = json.loads(response.choices[0].message.content)  # {"name": "Paris", ...}
 
 # But reasoning is still accessible
 thinking = response.choices[0].message.reasoning  # "Let me think about Paris..."
 ```
 
-### ✅ Guaranteed Valid JSON
-
-No more JSON parsing errors - automatic validation and retry:
-
-```python
-response = client.complete(
-    messages=[UserMessage(content="Give me a JSON response")],
-    model="Codestral-2501",
-    response_format="json_object"  # ✨ Auto-validation + retry
-)
-
-# Always valid JSON, no try/catch needed!
-data = response.choices[0].message.content
-```
+_Note: JSON responses are automatically cleaned of markdown wrappers (like \`\`\`json blocks) for reliable parsing._
 
 ### 🔄 Smart Automatic Retries
 

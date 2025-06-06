@@ -9,12 +9,13 @@ This example demonstrates the key features of the enhanced ChatCompletionsClient
 """
 
 from dotenv import load_dotenv
+
 from azure_ai_inference_plus import (
+    AzureKeyCredential,
     ChatCompletionsClient,
     RetryConfig,
     SystemMessage,
     UserMessage,
-    AzureKeyCredential,
 )
 
 # Load environment variables from .env file
@@ -46,8 +47,37 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    # Example 2: JSON mode with reasoning models
-    print("\n=== Example 2: JSON Mode with Reasoning Models ===")
+    # Example 2: JSON mode with standard models
+    print("\n=== Example 2: JSON Mode with Standard Models ===")
+
+    try:
+        response = client.complete(
+            messages=[
+                SystemMessage(content="You are a helpful assistant that returns JSON."),
+                UserMessage(
+                    content="Give me information about Tokyo in JSON format with keys: name, country, population, famous_for"
+                ),
+            ],
+            max_tokens=500,
+            model="gpt-4o",  # Standard model - no reasoning separation needed
+            response_format="json_object",  # Enables automatic JSON validation & retries
+        )
+
+        print(f"✅ Valid JSON Response: {response.choices[0].message.content}")
+
+        # Demonstrate that it's actually valid JSON by parsing it
+        import json
+
+        parsed_json = json.loads(response.choices[0].message.content)
+        print(
+            f"✅ Successfully parsed as JSON: {type(parsed_json)} with keys: {list(parsed_json.keys())}"
+        )
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    # Example 3: JSON mode with reasoning models
+    print("\n=== Example 3: JSON Mode with Reasoning Models ===")
     print("📝 Important: For reasoning models (like DeepSeek-R1) in JSON mode:")
     print("   • Use generous max_tokens (1500+) - reasoning + JSON needs space")
     print("   • Provide reasoning_tags to separate thinking from JSON output")
@@ -69,7 +99,15 @@ def main():
             ],  # 🚨 REQUIRED: For reasoning separation
         )
 
-        print(f"JSON Response: {response.choices[0].message.content}")
+        print(f"✅ Valid JSON Response: {response.choices[0].message.content}")
+
+        # Demonstrate that it's actually valid JSON by parsing it
+        import json
+
+        parsed_json = json.loads(response.choices[0].message.content)
+        print(
+            f"✅ Successfully parsed as JSON: {type(parsed_json)} with keys: {list(parsed_json.keys())}"
+        )
 
         # Show extracted reasoning if available
         if (
@@ -81,8 +119,8 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    # Example 3: Custom retry configuration
-    print("\n=== Example 3: Custom Retry Configuration ===")
+    # Example 4: Custom retry configuration
+    print("\n=== Example 4: Custom Retry Configuration ===")
 
     try:
         # Override default retry behavior
@@ -106,8 +144,8 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    # Example 4: Manual credential setup
-    print("\n=== Example 4: Manual Credential Setup ===")
+    # Example 5: Manual credential setup
+    print("\n=== Example 5: Manual Credential Setup ===")
 
     try:
         # Manual client setup with credentials
