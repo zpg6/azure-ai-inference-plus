@@ -7,7 +7,8 @@ with automatic retry features.
 """
 
 from dotenv import load_dotenv
-from azure_ai_inference_plus import EmbeddingsClient, RetryConfig, AzureKeyCredential
+
+from azure_ai_inference_plus import AzureKeyCredential, EmbeddingsClient, RetryConfig
 
 # Load environment variables from .env file
 load_dotenv()

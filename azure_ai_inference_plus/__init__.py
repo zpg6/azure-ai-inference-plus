@@ -2,25 +2,25 @@
 Azure AI Inference Plus - Enhanced wrapper for Azure AI Inference SDK
 """
 
-from .client import ChatCompletionsClient, EmbeddingsClient, ChatClient
+# Re-export commonly used classes from Azure AI Inference SDK for convenience
+from azure.ai.inference.models import (
+    AssistantMessage,
+    ChatRequestMessage,
+    JsonSchemaFormat,
+    SystemMessage,
+    ToolMessage,
+    UserMessage,
+)
+from azure.core.credentials import AzureKeyCredential
+
+from .client import ChatClient, ChatCompletionsClient, EmbeddingsClient
 from .config import RetryConfig
 from .exceptions import (
     AzureAIInferencePlusError,
+    ConfigurationError,
     JSONValidationError,
     RetryExhaustedError,
-    ConfigurationError,
 )
-
-# Re-export commonly used classes from Azure AI Inference SDK for convenience
-from azure.ai.inference.models import (
-    SystemMessage,
-    UserMessage,
-    AssistantMessage,
-    ToolMessage,
-    ChatRequestMessage,
-    JsonSchemaFormat,
-)
-from azure.core.credentials import AzureKeyCredential
 
 __version__ = "1.0.0"
 __all__ = [

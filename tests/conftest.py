@@ -6,27 +6,28 @@ This file contains pytest fixtures and configuration that can be used
 across all test files.
 """
 
-import pytest
 import os
 
+import pytest
 
-@pytest.fixture(autouse=True)  
+
+@pytest.fixture(autouse=True)
 def clean_environment():
     """Clean environment variables before each test to avoid interference"""
     # Store original values
-    original_endpoint = os.environ.get('AZURE_AI_ENDPOINT')
-    original_key = os.environ.get('AZURE_AI_API_KEY')
-    
+    original_endpoint = os.environ.get("AZURE_AI_ENDPOINT")
+    original_key = os.environ.get("AZURE_AI_API_KEY")
+
     # Remove environment variables for clean test state
-    if 'AZURE_AI_ENDPOINT' in os.environ:
-        del os.environ['AZURE_AI_ENDPOINT']
-    if 'AZURE_AI_API_KEY' in os.environ:
-        del os.environ['AZURE_AI_API_KEY']
-        
+    if "AZURE_AI_ENDPOINT" in os.environ:
+        del os.environ["AZURE_AI_ENDPOINT"]
+    if "AZURE_AI_API_KEY" in os.environ:
+        del os.environ["AZURE_AI_API_KEY"]
+
     yield
-    
+
     # Restore original values after test
     if original_endpoint is not None:
-        os.environ['AZURE_AI_ENDPOINT'] = original_endpoint
+        os.environ["AZURE_AI_ENDPOINT"] = original_endpoint
     if original_key is not None:
-        os.environ['AZURE_AI_API_KEY'] = original_key 
+        os.environ["AZURE_AI_API_KEY"] = original_key

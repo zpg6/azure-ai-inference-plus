@@ -6,6 +6,7 @@ This example demonstrates callbacks in action with real requests.
 """
 
 from dotenv import load_dotenv
+
 from azure_ai_inference_plus import (
     ChatCompletionsClient,
     RetryConfig,

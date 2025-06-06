@@ -1,11 +1,11 @@
 """Utility functions for Azure AI Inference Plus"""
 
-import json
-import time
 import functools
+import json
 import re
-from typing import Any, Callable, TypeVar, List, Tuple, Optional
-from urllib.parse import urlparse, urljoin
+import time
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
+from urllib.parse import urljoin, urlparse
 
 from .config import RetryConfig
 from .exceptions import JSONValidationError, RetryExhaustedError
