@@ -59,6 +59,12 @@ Homepage = "https://github.com/zpg6/azure-ai-inference-plus"
 Repository = "https://github.com/zpg6/azure-ai-inference-plus.git"
 Issues = "https://github.com/zpg6/azure-ai-inference-plus/issues"
 
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.exclude-package-data]
+"*" = [".env", "*.env"]
+
 [tool.setuptools.packages.find]
 include = ["azure_ai_inference_plus*"]
 
