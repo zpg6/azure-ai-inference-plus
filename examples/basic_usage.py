@@ -149,7 +149,7 @@ def main():
 
     try:
         # Manual client setup with credentials
-        manual_client = ChatCompletionsClient(
+        ChatCompletionsClient(
             endpoint="https://your-resource.services.ai.azure.com/models",  # Replace with your endpoint
             credential=AzureKeyCredential(
                 "your-api-key-here"

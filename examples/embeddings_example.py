@@ -81,7 +81,7 @@ def main():
 
     try:
         # Manual embeddings client setup
-        manual_client = EmbeddingsClient(
+        EmbeddingsClient(
             endpoint="https://your-resource.services.ai.azure.com/models",  # Replace with your endpoint
             credential=AzureKeyCredential(
                 "your-api-key-here"
