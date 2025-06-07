@@ -48,7 +48,7 @@ class TestUtils:
         # Test content with reasoning tags
         content = "Let me think. <think>This is reasoning content</think> Here is the final answer."
         reasoning, cleaned = parse_reasoning_from_content(
-            content, ["<think>", "</think>"], remove_reasoning=True
+            content, ["<think>", "</think>"]
         )
 
         assert reasoning == "This is reasoning content"
@@ -57,7 +57,7 @@ class TestUtils:
         # Test content without reasoning tags
         content = "Just a regular response without reasoning."
         reasoning, cleaned = parse_reasoning_from_content(
-            content, ["<think>", "</think>"], remove_reasoning=True
+            content, ["<think>", "</think>"]
         )
 
         assert reasoning is None
@@ -66,7 +66,7 @@ class TestUtils:
         # Test with multiple reasoning blocks
         content = "<think>First thought</think> Some text <think>Second thought</think> Final text"
         reasoning, cleaned = parse_reasoning_from_content(
-            content, ["<think>", "</think>"], remove_reasoning=True
+            content, ["<think>", "</think>"]
         )
 
         assert reasoning == "First thought\nSecond thought"

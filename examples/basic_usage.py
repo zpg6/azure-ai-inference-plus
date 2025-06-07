@@ -5,7 +5,8 @@ Basic usage example for Azure AI Inference Plus
 This example demonstrates the key features of the enhanced ChatCompletionsClient:
 - Automatic retry with exponential backoff
 - JSON validation and automatic retries for JSON responses
-- Reasoning separation for models like DeepSeek-R1
+- Reasoning separation for models like DeepSeek-R1 (both JSON and non-JSON modes)
+- Clean content extraction with reasoning accessible separately
 """
 
 from dotenv import load_dotenv
@@ -144,8 +145,48 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    # Example 5: Manual credential setup
-    print("\n=== Example 5: Manual Credential Setup ===")
+    # Example 5: Reasoning separation with DeepSeek in non-JSON mode
+    print("\n=== Example 5: DeepSeek Reasoning Separation (Non-JSON Mode) ===")
+    print("🎯 Demonstrates: Clean reasoning extraction for better user experience")
+
+    try:
+        response = client.complete(
+            messages=[
+                SystemMessage(
+                    content="You are a helpful assistant that thinks step by step."
+                ),
+                UserMessage(content="Explain why the sky appears blue during the day."),
+            ],
+            max_tokens=1000,
+            model="DeepSeek-R1",
+            reasoning_tags=[
+                "<think>",
+                "</think>",
+            ],  # 🚨 Key: Enables reasoning separation
+        )
+
+        print(f"   Clean Content: {response.choices[0].message.content}")
+        print("\n")
+
+        # Show extracted reasoning if available
+        if (
+            hasattr(response.choices[0].message, "reasoning")
+            and response.choices[0].message.reasoning
+        ):
+            print(
+                f"   Extracted Reasoning: {response.choices[0].message.reasoning[:100]}..."
+            )
+            print(
+                "\n🎯 Perfect! User sees clean answer, reasoning is accessible separately"
+            )
+        else:
+            print("   No reasoning extracted (check model supports reasoning)")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    # Example 6: Manual credential setup
+    print("\n=== Example 6: Manual Credential Setup ===")
 
     try:
         # Manual client setup with credentials

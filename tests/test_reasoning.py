@@ -52,7 +52,7 @@ class TestReasoningFunctionality:
             assert result.choices[0].message.reasoning == "Let me format this as JSON"
 
     def test_reasoning_with_non_json_mode(self):
-        """Test reasoning functionality with non-JSON mode (should keep reasoning separate)"""
+        """Test reasoning functionality with non-JSON mode (should separate reasoning from content)"""
         endpoint = "https://test.openai.azure.com"
         credential = AzureKeyCredential("test-key")
 
@@ -75,11 +75,8 @@ class TestReasoningFunctionality:
                 reasoning_tags=["<think>", "</think>"],
             )
 
-            # Original content should be preserved in non-JSON mode
-            assert (
-                result.choices[0].message.content
-                == "<think>Let me think about this</think>The answer is 42."
-            )
+            # Reasoning should be removed from content for clean output
+            assert result.choices[0].message.content == "The answer is 42."
             # Reasoning should be accessible separately
             assert result.choices[0].message.reasoning == "Let me think about this"
 

@@ -100,20 +100,19 @@ def validate_json_response(response_content: str) -> bool:
 
 
 def parse_reasoning_from_content(
-    content: str, reasoning_tags: List[str], remove_reasoning: bool = False
+    content: str, reasoning_tags: List[str]
 ) -> Tuple[Optional[str], str]:
     """
-    Parse reasoning content from response based on reasoning tags.
+    Parse reasoning content from response based on reasoning tags and remove it from content.
 
     Args:
         content: The response content to parse
         reasoning_tags: List with start and end tags [start_tag, end_tag]
-        remove_reasoning: If True, remove reasoning from content entirely
 
     Returns:
         Tuple of (reasoning_content, cleaned_content)
         - reasoning_content: The extracted reasoning text (None if no reasoning found)
-        - cleaned_content: Content with reasoning removed or original content
+        - cleaned_content: Content with reasoning removed
     """
     if not reasoning_tags or len(reasoning_tags) != 2:
         return None, content
@@ -136,16 +135,12 @@ def parse_reasoning_from_content(
     # Extract reasoning content (join multiple blocks if present)
     reasoning_content = "\n".join(match.strip() for match in reasoning_matches)
 
-    if remove_reasoning:
-        # Remove all reasoning blocks entirely
-        cleaned_content = re.sub(pattern, "", content, flags=re.DOTALL)
-        # Clean up any extra whitespace
-        cleaned_content = re.sub(r"\n\s*\n", "\n", cleaned_content).strip()
-        # Also strip markdown wrappers for JSON content
-        cleaned_content = strip_json_markdown_wrappers(cleaned_content)
-    else:
-        # Keep original content
-        cleaned_content = content
+    # Remove all reasoning blocks entirely
+    cleaned_content = re.sub(pattern, "", content, flags=re.DOTALL)
+    # Clean up any extra whitespace
+    cleaned_content = re.sub(r"\n\s*\n", "\n", cleaned_content).strip()
+    # Also strip markdown wrappers for JSON content
+    cleaned_content = strip_json_markdown_wrappers(cleaned_content)
 
     return reasoning_content if reasoning_content else None, cleaned_content
 
@@ -159,10 +154,10 @@ def process_response_with_reasoning(
     Args:
         response: The response object from Azure AI Inference
         reasoning_tags: List with start and end tags [start_tag, end_tag]
-        is_json_mode: Whether this is JSON mode (reasoning should be removed)
+        is_json_mode: Whether this is JSON mode (kept for backward compatibility, but reasoning is always removed)
 
     Returns:
-        Modified response object with reasoning field added
+        Modified response object with reasoning field added and reasoning removed from content
     """
     if not hasattr(response, "choices") or not response.choices:
         return response
@@ -172,8 +167,10 @@ def process_response_with_reasoning(
         if hasattr(choice, "message") and hasattr(choice.message, "content"):
             content = choice.message.content
             if content:
+                # Always remove reasoning from content when reasoning_tags are provided
+                # This ensures consistent behavior between JSON and non-JSON modes
                 reasoning, cleaned_content = parse_reasoning_from_content(
-                    content, reasoning_tags, remove_reasoning=is_json_mode
+                    content, reasoning_tags
                 )
 
                 # Update the message content
@@ -228,7 +225,7 @@ def retry_with_config(
                             validation_content = content
                             if reasoning_tags and len(reasoning_tags) == 2:
                                 _, validation_content = parse_reasoning_from_content(
-                                    content, reasoning_tags, remove_reasoning=True
+                                    content, reasoning_tags
                                 )
 
                             if not validate_json_response(validation_content):
