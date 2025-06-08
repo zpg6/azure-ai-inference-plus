@@ -16,6 +16,20 @@ Enhanced wrapper that makes Azure AI Inference SDK simple and reliable with **au
 ✅ **One import** - no need for multiple Azure SDK imports  
 ✅ **100% compatible** - drop-in replacement for Azure AI Inference SDK
 
+## 🛡️ Handles Real-World LLM Issues
+
+Automatic retries for the errors you actually encounter in production:
+
+```
+🔄 Service overloaded (timeouts)     → Auto-retry with backoff
+🔄 Rate limits (429)                 → Smart retry timing
+🔄 Azure service hiccups (5xx)       → Exponential backoff
+🔄 Invalid JSON responses            → Re-request clean JSON
+🔄 Network timeouts                  → Multiple quick attempts
+```
+
+**Just works.** No manual error handling needed.
+
 ## Installation
 
 ```bash
@@ -131,20 +145,21 @@ _Note: JSON responses are automatically cleaned of markdown wrappers (like \`\`\
 Built-in retry with exponential backoff - no configuration needed:
 
 ```python
-# Automatically retries on failures - just works!
+# Automatically retries on failures (including timeouts) - just works!
 response = client.complete(
     messages=[UserMessage(content="Tell me a joke")],
     model="Phi-4"
 )
 ```
 
-### ⚙️ Custom Retry (If Needed)
+### ⚙️ Custom Retry Configuration
 
 ```python
 from azure_ai_inference_plus import RetryConfig
 
-# Override default behavior
+# Override default behavior (with smart timeout strategy)
 client = ChatCompletionsClient(
+    connection_timeout=100.0,  # Better: 100s + retries vs 300s timeout
     retry_config=RetryConfig(max_retries=5, delay_seconds=2.0)
 )
 ```
@@ -233,9 +248,9 @@ client = ChatCompletionsClient(
 
 Check out the [`examples/`](examples/) directory for complete demonstrations:
 
-- [`basic_usage.py`](examples/basic_usage.py) - **Reasoning separation**, JSON validation, and retry features
+- [`basic_usage.py`](examples/basic_usage.py) - Reasoning separation, JSON validation, retry features, and timeout strategy
 - [`embeddings_example.py`](examples/embeddings_example.py) - Embeddings with retry and credential setup
-- [`callbacks_example.py`](examples/callbacks_example.py) - **Retry callbacks** for logging and monitoring
+- [`callbacks_example.py`](examples/callbacks_example.py) - Retry callbacks for logging and monitoring
 
 All examples show real-world usage patterns and advanced features.
 
@@ -246,3 +261,7 @@ All examples show real-world usage patterns and advanced features.
 ## Contributing
 
 Contributions are welcome! Whether it's bug fixes, feature additions, or documentation improvements, we appreciate your help in making this project better. For major changes or new features, please open an issue first to discuss what you would like to change.
+
+## Related Projects
+
+- [langchain-azure-ai-inference-plus](https://github.com/zpg6/langchain-azure-ai-inference-plus) - **The easier way to use Azure AI Inference SDK with LangChain ✨**

@@ -54,6 +54,7 @@ class ChatCompletionsClient(AzureChatCompletionsClient):
         credential: Optional[AzureKeyCredential] = None,
         api_version: str = "2024-05-01-preview",
         retry_config: Optional[RetryConfig] = None,
+        connection_timeout: Optional[float] = None,
         **kwargs,
     ):
         """
@@ -64,6 +65,7 @@ class ChatCompletionsClient(AzureChatCompletionsClient):
             credential: AzureKeyCredential (can be created from AZURE_AI_API_KEY env var)
             api_version: API version to use
             retry_config: Retry configuration (uses defaults if not provided)
+            connection_timeout: HTTP connection timeout in seconds (default: 300)
             **kwargs: Additional arguments passed to the base client
         """
         # Handle endpoint from environment
@@ -90,9 +92,17 @@ class ChatCompletionsClient(AzureChatCompletionsClient):
         # Set up retry configuration
         self.retry_config = retry_config or RetryConfig()
 
+        # Configure timeout if provided
+        if connection_timeout is not None:
+            # Azure SDK uses connection_timeout parameter
+            kwargs["connection_timeout"] = connection_timeout
+
         # Initialize the base client
         super().__init__(
-            endpoint=endpoint, credential=credential, api_version=api_version, **kwargs
+            endpoint=endpoint,
+            credential=credential,
+            api_version=api_version,
+            **kwargs,
         )
 
     def complete(
@@ -207,6 +217,7 @@ class EmbeddingsClient(AzureEmbeddingsClient):
         endpoint: Optional[str] = None,
         credential: Optional[AzureKeyCredential] = None,
         retry_config: Optional[RetryConfig] = None,
+        connection_timeout: Optional[float] = None,
         **kwargs,
     ):
         """
@@ -216,6 +227,7 @@ class EmbeddingsClient(AzureEmbeddingsClient):
             endpoint: Azure AI endpoint URL (can be set via AZURE_AI_ENDPOINT env var)
             credential: AzureKeyCredential (can be created from AZURE_AI_API_KEY env var)
             retry_config: Retry configuration (uses defaults if not provided)
+            connection_timeout: HTTP connection timeout in seconds (default: 300)
             **kwargs: Additional arguments passed to the base client
         """
         # Handle endpoint from environment
@@ -238,6 +250,10 @@ class EmbeddingsClient(AzureEmbeddingsClient):
 
         # Set up retry configuration
         self.retry_config = retry_config or RetryConfig()
+
+        # Configure timeout if provided
+        if connection_timeout is not None:
+            kwargs["connection_timeout"] = connection_timeout
 
         # Initialize the base client
         super().__init__(endpoint=endpoint, credential=credential, **kwargs)

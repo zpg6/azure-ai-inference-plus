@@ -145,8 +145,38 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    # Example 5: Reasoning separation with DeepSeek in non-JSON mode
-    print("\n=== Example 5: DeepSeek Reasoning Separation (Non-JSON Mode) ===")
+    # Example 5: Smart timeout strategy - shorter timeout + retries
+    print("\n=== Example 5: Smart Timeout Strategy ===")
+    print("💡 Better: 100s timeout + retries vs default 300s timeout")
+
+    try:
+        # Recommended approach for handling timeouts
+        timeout_client = ChatCompletionsClient(
+            connection_timeout=100.0,  # 100s instead of default 300s
+            retry_config=RetryConfig(
+                max_retries=4,  # 5 total attempts
+                delay_seconds=2.0,
+                exponential_backoff=True,
+            ),
+        )
+
+        response = timeout_client.complete(
+            messages=[
+                SystemMessage(content="You are a helpful assistant."),
+                UserMessage(content="Explain quantum computing in detail."),
+            ],
+            max_tokens=800,
+            model="gpt-4o",
+        )
+
+        print(f"Response: {response.choices[0].message.content[:100]}...")
+        print("✅ Strategy: 5 × 100s attempts = faster failure detection than 1 × 300s")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    # Example 6: Reasoning separation with DeepSeek in non-JSON mode
+    print("\n=== Example 6: DeepSeek Reasoning Separation (Non-JSON Mode) ===")
     print("🎯 Demonstrates: Clean reasoning extraction for better user experience")
 
     try:
@@ -185,8 +215,8 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
 
-    # Example 6: Manual credential setup
-    print("\n=== Example 6: Manual Credential Setup ===")
+    # Example 7: Manual credential setup
+    print("\n=== Example 7: Manual Credential Setup ===")
 
     try:
         # Manual client setup with credentials

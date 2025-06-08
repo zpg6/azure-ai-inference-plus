@@ -60,6 +60,17 @@ class RetryConfig:
             TimeoutError,
         )
 
+        # Also retry on Azure ServiceResponseError which includes timeout errors
+        from azure.core.exceptions import ServiceResponseError
+
+        if isinstance(exception, ServiceResponseError):
+            # Check if it's a timeout error
+            if (
+                "timeout" in str(exception).lower()
+                or "timed out" in str(exception).lower()
+            ):
+                return True
+
         return isinstance(exception, transient_errors)
 
     def get_delay(self, attempt: int, exception: Exception = None) -> float:
