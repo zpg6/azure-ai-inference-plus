@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 (2025-06-08)
+
+- Export AzureChatCompletionsClientKwargs and AzureEmbeddingsClientKwargs
+
 ## 1.0.3 (2025-06-08)
 
 - Add support for Python 3.13

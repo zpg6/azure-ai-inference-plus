@@ -13,7 +13,13 @@ from azure.ai.inference.models import (
 )
 from azure.core.credentials import AzureKeyCredential
 
-from .client import ChatClient, ChatCompletionsClient, EmbeddingsClient
+from .client import (
+    AzureChatCompletionsClientKwargs,
+    AzureEmbeddingsClientKwargs,
+    ChatClient,
+    ChatCompletionsClient,
+    EmbeddingsClient,
+)
 from .config import RetryConfig
 from .exceptions import (
     AzureAIInferencePlusError,
@@ -22,8 +28,10 @@ from .exceptions import (
     RetryExhaustedError,
 )
 
-__version__ = "1.0.0"
+__version__ = "1.0.4"
 __all__ = [
+    "AzureChatCompletionsClientKwargs",
+    "AzureEmbeddingsClientKwargs",
     "ChatCompletionsClient",
     "ChatClient",  # Alias for ChatCompletionsClient
     "EmbeddingsClient",

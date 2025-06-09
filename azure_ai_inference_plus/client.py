@@ -1,15 +1,15 @@
 """Enhanced client classes that extend Azure AI Inference clients"""
 
 import os
-from typing import Any, Dict, List, Literal, Optional, Union, TypedDict, Unpack
+from typing import Any, Dict, List, Literal, Optional, TypedDict, Union, Unpack
 
 from azure.ai.inference import ChatCompletionsClient as AzureChatCompletionsClient
 from azure.ai.inference import EmbeddingsClient as AzureEmbeddingsClient
 from azure.ai.inference.models import (
     AssistantMessage,
-    ChatCompletionsToolDefinition,
-    ChatCompletionsToolChoicePreset,
     ChatCompletionsNamedToolChoice,
+    ChatCompletionsToolChoicePreset,
+    ChatCompletionsToolDefinition,
     JsonSchemaFormat,
     SystemMessage,
     UserMessage,
@@ -28,10 +28,10 @@ from .utils import (
 class AzureChatCompletionsClientKwargs(TypedDict, total=False):
     """
     Keyword arguments that can be passed to the Azure ChatCompletionsClient constructor.
-    
-    Only includes parameters that users would reasonably want to configure 
+
+    Only includes parameters that users would reasonably want to configure
     when using our enhanced wrapper library.
-    
+
     Args:
         temperature: The sampling temperature to use that controls the apparent creativity of
             generated completions. Higher values will make output more random while lower values
@@ -73,26 +73,29 @@ class AzureChatCompletionsClientKwargs(TypedDict, total=False):
         headers: Additional HTTP request headers to include. Default value is None.
         logging_enable: Whether to enable detailed logging for debugging. Default value is False.
     """
+
     # Default chat completion behavior (commonly customized)
     temperature: Optional[float]
     max_tokens: Optional[int]
     model: Optional[str]
-    
+
     # Advanced completion parameters (less common but useful)
     frequency_penalty: Optional[float]
     presence_penalty: Optional[float]
     top_p: Optional[float]
     seed: Optional[int]
     stop: Optional[List[str]]
-    
+
     # Tool usage (for function calling)
     tools: Optional[List[ChatCompletionsToolDefinition]]
-    tool_choice: Optional[Union[str, ChatCompletionsToolChoicePreset, ChatCompletionsNamedToolChoice]]
-    
+    tool_choice: Optional[
+        Union[str, ChatCompletionsToolChoicePreset, ChatCompletionsNamedToolChoice]
+    ]
+
     # Format and model-specific options
     response_format: Optional[Union[Literal["text", "json_object"], JsonSchemaFormat]]
     model_extras: Optional[Dict[str, Any]]
-    
+
     # HTTP/SDK configuration
     headers: Optional[Dict[str, str]]
     logging_enable: bool
@@ -101,10 +104,10 @@ class AzureChatCompletionsClientKwargs(TypedDict, total=False):
 class AzureEmbeddingsClientKwargs(TypedDict, total=False):
     """
     Keyword arguments that can be passed to the Azure EmbeddingsClient constructor.
-    
+
     Only includes parameters that users would reasonably want to configure
     when using our enhanced wrapper library.
-    
+
     Args:
         dimensions: The number of dimensions the resulting output embeddings should have.
             Default value is None.
@@ -120,13 +123,16 @@ class AzureEmbeddingsClientKwargs(TypedDict, total=False):
         headers: Additional HTTP request headers to include. Default value is None.
         logging_enable: Whether to enable detailed logging for debugging. Default value is False.
     """
+
     # Embedding-specific parameters
     dimensions: Optional[int]
-    encoding_format: Optional[str]  # Could be more specific with Literal types if needed
-    input_type: Optional[str]       # Could be more specific with Literal types if needed
+    encoding_format: Optional[
+        str
+    ]  # Could be more specific with Literal types if needed
+    input_type: Optional[str]  # Could be more specific with Literal types if needed
     model: Optional[str]
     model_extras: Optional[Dict[str, Any]]
-    
+
     # HTTP/SDK configuration
     headers: Optional[Dict[str, str]]
     logging_enable: bool
