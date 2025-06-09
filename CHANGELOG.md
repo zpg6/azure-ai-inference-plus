@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3 (2025-06-08)
+
+- Add support for Python 3.13
+- Drop support for Python 3.10
+- Enhance typing support
+
 ## 1.0.2 (2025-06-08)
 
 - Add retry support for connection timeouts

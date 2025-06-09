@@ -1,17 +1,20 @@
 """Enhanced client classes that extend Azure AI Inference clients"""
 
 import os
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union, TypedDict, Unpack
 
 from azure.ai.inference import ChatCompletionsClient as AzureChatCompletionsClient
 from azure.ai.inference import EmbeddingsClient as AzureEmbeddingsClient
 from azure.ai.inference.models import (
     AssistantMessage,
+    ChatCompletionsToolDefinition,
+    ChatCompletionsToolChoicePreset,
+    ChatCompletionsNamedToolChoice,
     JsonSchemaFormat,
     SystemMessage,
     UserMessage,
 )
-from azure.core.credentials import AzureKeyCredential
+from azure.core.credentials import AzureKeyCredential, TokenCredential
 
 from .config import RetryConfig
 from .exceptions import ConfigurationError
@@ -20,6 +23,113 @@ from .utils import (
     process_response_with_reasoning,
     retry_with_config,
 )
+
+
+class AzureChatCompletionsClientKwargs(TypedDict, total=False):
+    """
+    Keyword arguments that can be passed to the Azure ChatCompletionsClient constructor.
+    
+    Only includes parameters that users would reasonably want to configure 
+    when using our enhanced wrapper library.
+    
+    Args:
+        temperature: The sampling temperature to use that controls the apparent creativity of
+            generated completions. Higher values will make output more random while lower values
+            will make results more focused and deterministic. Supported range is [0, 1].
+            Default value is None.
+        max_tokens: The maximum number of tokens to generate. Default value is None.
+        model: ID of the specific AI model to use, if more than one model is available on the
+            endpoint. Default value is None.
+        frequency_penalty: A value that influences the probability of generated tokens appearing
+            based on their cumulative frequency in generated text. Positive values will make
+            tokens less likely to appear as their frequency increases and decrease the likelihood
+            of the model repeating the same statements verbatim. Supported range is [-2, 2].
+            Default value is None.
+        presence_penalty: A value that influences the probability of generated tokens appearing
+            based on their existing presence in generated text. Positive values will make tokens
+            less likely to appear when they already exist and increase the model's likelihood to
+            output new topics. Supported range is [-2, 2]. Default value is None.
+        top_p: An alternative to sampling with temperature called nucleus sampling. This value
+            causes the model to consider the results of tokens with the provided probability mass.
+            As an example, a value of 0.15 will cause only the tokens comprising the top 15% of
+            probability mass to be considered. Supported range is [0, 1]. Default value is None.
+        seed: If specified, the system will make a best effort to sample deterministically such
+            that repeated requests with the same seed and parameters should return the same result.
+            Determinism is not guaranteed. Default value is None.
+        stop: A collection of textual sequences that will end completions generation.
+            Default value is None.
+        tools: The available tool definitions that the chat completions request can use,
+            including caller-defined functions. Default value is None.
+        tool_choice: If specified, the model will configure which of the provided tools it can
+            use for the chat completions response. Default value is None.
+        response_format: The format that the AI model must output. AI chat completions models
+            typically output unformatted text by default. This is equivalent to setting "text"
+            as the response_format. To output JSON format, without adhering to any schema, set to
+            "json_object". To output JSON format adhering to a provided schema, set this to an
+            object of the class JsonSchemaFormat. Default value is None.
+        model_extras: Additional, model-specific parameters that are not in the standard request
+            payload. They will be added as-is to the root of the JSON in the request body.
+            Default value is None.
+        headers: Additional HTTP request headers to include. Default value is None.
+        logging_enable: Whether to enable detailed logging for debugging. Default value is False.
+    """
+    # Default chat completion behavior (commonly customized)
+    temperature: Optional[float]
+    max_tokens: Optional[int]
+    model: Optional[str]
+    
+    # Advanced completion parameters (less common but useful)
+    frequency_penalty: Optional[float]
+    presence_penalty: Optional[float]
+    top_p: Optional[float]
+    seed: Optional[int]
+    stop: Optional[List[str]]
+    
+    # Tool usage (for function calling)
+    tools: Optional[List[ChatCompletionsToolDefinition]]
+    tool_choice: Optional[Union[str, ChatCompletionsToolChoicePreset, ChatCompletionsNamedToolChoice]]
+    
+    # Format and model-specific options
+    response_format: Optional[Union[Literal["text", "json_object"], JsonSchemaFormat]]
+    model_extras: Optional[Dict[str, Any]]
+    
+    # HTTP/SDK configuration
+    headers: Optional[Dict[str, str]]
+    logging_enable: bool
+
+
+class AzureEmbeddingsClientKwargs(TypedDict, total=False):
+    """
+    Keyword arguments that can be passed to the Azure EmbeddingsClient constructor.
+    
+    Only includes parameters that users would reasonably want to configure
+    when using our enhanced wrapper library.
+    
+    Args:
+        dimensions: The number of dimensions the resulting output embeddings should have.
+            Default value is None.
+        encoding_format: The desired format for the returned embeddings. Known values are:
+            "base64", "binary", "float", "int8", "ubinary", and "uint8". Default value is None.
+        input_type: The type of the input. Known values are: "text", "query", and "document".
+            Default value is None.
+        model: ID of the specific AI model to use, if more than one model is available on the
+            endpoint. Default value is None.
+        model_extras: Additional, model-specific parameters that are not in the standard request
+            payload. They will be added as-is to the root of the JSON in the request body.
+            Default value is None.
+        headers: Additional HTTP request headers to include. Default value is None.
+        logging_enable: Whether to enable detailed logging for debugging. Default value is False.
+    """
+    # Embedding-specific parameters
+    dimensions: Optional[int]
+    encoding_format: Optional[str]  # Could be more specific with Literal types if needed
+    input_type: Optional[str]       # Could be more specific with Literal types if needed
+    model: Optional[str]
+    model_extras: Optional[Dict[str, Any]]
+    
+    # HTTP/SDK configuration
+    headers: Optional[Dict[str, str]]
+    logging_enable: bool
 
 
 class ChatCompletionsClient(AzureChatCompletionsClient):
@@ -51,22 +161,22 @@ class ChatCompletionsClient(AzureChatCompletionsClient):
     def __init__(
         self,
         endpoint: Optional[str] = None,
-        credential: Optional[AzureKeyCredential] = None,
+        credential: Optional[Union[AzureKeyCredential, TokenCredential]] = None,
         api_version: str = "2024-05-01-preview",
         retry_config: Optional[RetryConfig] = None,
         connection_timeout: Optional[float] = None,
-        **kwargs,
+        **kwargs: Unpack[AzureChatCompletionsClientKwargs],
     ):
         """
         Initialize the enhanced ChatCompletionsClient.
 
         Args:
             endpoint: Azure AI endpoint URL (can be set via AZURE_AI_ENDPOINT env var)
-            credential: AzureKeyCredential (can be created from AZURE_AI_API_KEY env var)
+            credential: AzureKeyCredential or TokenCredential (can be created from AZURE_AI_API_KEY env var)
             api_version: API version to use
             retry_config: Retry configuration (uses defaults if not provided)
             connection_timeout: HTTP connection timeout in seconds (default: 300)
-            **kwargs: Additional arguments passed to the base client
+            **kwargs: Additional arguments passed to the base Azure ChatCompletionsClient
         """
         # Handle endpoint from environment
         if endpoint is None:
@@ -215,20 +325,20 @@ class EmbeddingsClient(AzureEmbeddingsClient):
     def __init__(
         self,
         endpoint: Optional[str] = None,
-        credential: Optional[AzureKeyCredential] = None,
+        credential: Optional[Union[AzureKeyCredential, TokenCredential]] = None,
         retry_config: Optional[RetryConfig] = None,
         connection_timeout: Optional[float] = None,
-        **kwargs,
+        **kwargs: Unpack[AzureEmbeddingsClientKwargs],
     ):
         """
         Initialize the enhanced EmbeddingsClient.
 
         Args:
             endpoint: Azure AI endpoint URL (can be set via AZURE_AI_ENDPOINT env var)
-            credential: AzureKeyCredential (can be created from AZURE_AI_API_KEY env var)
+            credential: AzureKeyCredential or TokenCredential (can be created from AZURE_AI_API_KEY env var)
             retry_config: Retry configuration (uses defaults if not provided)
             connection_timeout: HTTP connection timeout in seconds (default: 300)
-            **kwargs: Additional arguments passed to the base client
+            **kwargs: Additional arguments passed to the base Azure EmbeddingsClient
         """
         # Handle endpoint from environment
         if endpoint is None:
